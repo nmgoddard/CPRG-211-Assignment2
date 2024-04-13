@@ -1,0 +1,131 @@
+﻿@page "/FlightBooking"
+@using Assignment2.Resources
+@using Microsoft.Maui.Storage
+@using System.IO
+
+<h3>Flight Finder</h3>
+
+<div>
+	<div class ="btn-group-vertical">
+		<label for="originAirport">Origin Airport</label>
+		<input id="originAirport" placeholder="Airport 1" @bind="originAirport">
+	</div>
+	<div class="btn-group-vertical">
+		<label for="destination">Destination Airport</label>
+		<input id="destination" placeholder="Airport 2" @bind="destAirport">
+	</div>
+	<div class="btn-group-vertical">
+		<label for="departDate">Date of Departure</label>
+		<input id="departDate>" placeholder="Monday" @bind="weekday">
+	</div>
+	<button @onclick="() => LoadFlights(originAirport, destAirport, weekday)" class="btn-dark">Find Flights</button>
+</div>
+
+<h3>Flights Found</h3>
+<ul class="btn-group-vertical">
+	@foreach (var flight in flightList)
+	{
+		thisFlight = flight;
+		<li>
+			<button @onclick="() => OnChecked(thisFlight)">Chose</button>
+			@flight.ToString();
+		</li>
+	}
+</ul>
+
+<h3>Make Reservation</h3>
+<div class="btn-group-vertical">
+	<div class="btn-group-vertical">
+		<label for="flightCode">Flight Code</label>
+		<input @bind-value="@flightCode" id="flightCode" placeholder="LL-0000" readonly n >
+	</div>
+	<div class="btn-group-vertical">
+		<label for="airline">Airline</label>
+		<input id="airline" placeholder="Airline" @bind-value="airline" readonly>
+	</div>
+	<div class="btn-group-vertical">
+		<label for="weekday">Weekday</label>
+		<input id="weekday" placeholder="Monday" readonly @bind="dayOfWeek">
+	</div>
+	<div class="btn-group-vertical">
+		<label for="time">Time</label>
+		<input id="time" placeholder="HH:MM" readonly @bind="time">
+	</div>
+	<div class="btn-group-vertical">
+		<label for="cost">Cost</label>
+		<input id="cost" placeholder="$0.00" readonly @bind="flightCost">
+	</div>
+	<div class="btn-group-vertical">
+		<label for="name">Name</label>
+		<input id="name" placeholder="John Doe">
+	</div>
+	<div class="btn-group-vertical">
+		<label for="citizen">Citizenship</label>
+		<input id="citizen" placeholder="US, CA, etc...">
+	</div>
+	<p>@flightCode</p>
+	<button class="btn-dark">Reserve Flight</button>
+</div>
+
+<h3>Find Reservation</h3>
+<div>
+	<div class="btn-group-vertical">
+		<label for="resCode">Reservation Code</label>
+		<input id="resCode" placeholder="LDDDD">
+	</div>
+	<div class="btn-group-vertical">
+		<label for="resAirline">Airline</label>
+		<input id="resAirline" placeholder="Airline Name">
+	</div>
+	<div class="btn-group-vertical">
+		<label for="resName">Name</label>
+		<input id="resName>" placeholder="John Doe">
+	</div>
+	<button class="btn-dark">Find Flights</button>
+</div>
+
+<h3>Update Reservation</h3>
+
+
+
+@code {
+
+	List<Flight> flightList = new();
+	private Flight thisFlight;
+	private string? originAirport;
+	private string? destAirport;
+	private string? weekday;
+	private string? flightCode = "help";
+	private string? airline;
+	private string? dayOfWeek;
+	private string? time;
+	private string? flightCost;
+
+
+	void LoadFlights(string originAirport, string destAirport, string weekday)
+	{
+		flightList.Clear();
+		Directory.SetCurrentDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources"));
+		StreamReader streamReader = new StreamReader("data/flights.csv");
+		string line = streamReader.ReadLine();
+		while (line != null)
+		{
+			string[] flights = line.Split(new char[] { ',' });
+			if (flights[2] == originAirport.ToUpper() && flights[3] == destAirport.ToUpper() && flights[4].ToLower() == weekday.ToLower())
+			{
+				flightList.Add(new Flight(flights[0], flights[1], flights[2], flights[3], flights[4], flights[5], Convert.ToDouble(flights[6])));
+			}
+			line = streamReader.ReadLine();
+		}
+
+	}
+
+	void OnChecked(Flight flight)
+	{
+		flightCode = flight.FlightCode;
+		airline = flight.AirlineName;
+		dayOfWeek = flight.Weekday;
+		time = flight.Time;
+		flightCost = String.Format("${0:0.00}", flight.Cost);
+	}
+}
