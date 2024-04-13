@@ -44,7 +44,7 @@
               "RelativeDocumentMoniker": "Resources\\Flight.cs",
               "ToolTip": "C:\\Users\\tmgod\\Documents\\GitHub\\CPRG-211-Assignment2\\Assignment2\\Resources\\Flight.cs",
               "RelativeToolTip": "Resources\\Flight.cs",
-              "ViewState": "AQIAAAMAAAAAAAAAAAAqwCgAAAArAAAA",
+              "ViewState": "AQIAABcAAAAAAAAAAAA8wCgAAAADAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-12T15:21:00.174Z",
               "EditorCaption": ""
@@ -57,7 +57,7 @@
               "RelativeDocumentMoniker": "Resources\\Reservation.cs",
               "ToolTip": "C:\\Users\\tmgod\\Documents\\GitHub\\CPRG-211-Assignment2\\Assignment2\\Resources\\Reservation.cs",
               "RelativeToolTip": "Resources\\Reservation.cs",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAAAwAAAACAAAA",
+              "ViewState": "AQIAACgAAAAAAAAAAAAkwD8AAABvAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-12T14:50:49.162Z",
               "EditorCaption": ""
@@ -70,7 +70,7 @@
               "RelativeDocumentMoniker": "Components\\Pages\\FlightBooking.razor",
               "ToolTip": "C:\\Users\\tmgod\\Documents\\GitHub\\CPRG-211-Assignment2\\Assignment2\\Components\\Pages\\FlightBooking.razor",
               "RelativeToolTip": "Components\\Pages\\FlightBooking.razor",
-              "ViewState": "AQIAACcAAAAAAAAAAAAAACcAAABUAAAA",
+              "ViewState": "AQIAANQAAAAAAAAAAAAvwOgAAAAaAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2024-04-12T14:48:52.734Z",
               "EditorCaption": ""
@@ -109,9 +109,10 @@
               "RelativeDocumentMoniker": "Resources\\Data\\flights.csv",
               "ToolTip": "C:\\Users\\tmgod\\Documents\\GitHub\\CPRG-211-Assignment2\\Assignment2\\Resources\\Data\\flights.csv",
               "RelativeToolTip": "Resources\\Data\\flights.csv",
-              "ViewState": "AQIAAAMAAAAAAAAAAAAAAAEAAAAyAAAA",
+              "ViewState": "AQIAAAEAAAAAAAAAAABBwAEAAAAyAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
-              "WhenOpened": "2024-04-12T15:37:10.299Z"
+              "WhenOpened": "2024-04-12T15:37:10.299Z",
+              "EditorCaption": ""
             }
           ]
         }

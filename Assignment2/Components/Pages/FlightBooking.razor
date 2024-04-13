@@ -2,6 +2,7 @@
 @using Assignment2.Resources
 @using Microsoft.Maui.Storage
 @using System.IO
+@using System.Text.Json
 
 <h3>Flight Finder</h3>
 
@@ -25,9 +26,8 @@
 <ul class="btn-group-vertical">
 	@foreach (var flight in flightList)
 	{
-		thisFlight = flight;
 		<li>
-			<button @onclick="() => OnChecked(thisFlight)">Chose</button>
+			<button @onclick="() => Submit(flight)">Chose</button>
 			@flight.ToString();
 		</li>
 	}
@@ -41,91 +41,275 @@
 	</div>
 	<div class="btn-group-vertical">
 		<label for="airline">Airline</label>
-		<input id="airline" placeholder="Airline" @bind-value="airline" readonly>
+		<input @bind-value="airline" id=" airline" placeholder="Airline" readonly>
 	</div>
 	<div class="btn-group-vertical">
 		<label for="weekday">Weekday</label>
-		<input id="weekday" placeholder="Monday" readonly @bind="dayOfWeek">
+		<input @bind-value="dayOfWeek" id="weekday" placeholder="Monday" readonly>
 	</div>
 	<div class="btn-group-vertical">
 		<label for="time">Time</label>
-		<input id="time" placeholder="HH:MM" readonly @bind="time">
+		<input @bind-value="time" id="time" placeholder="HH:MM" readonly>
 	</div>
 	<div class="btn-group-vertical">
 		<label for="cost">Cost</label>
-		<input id="cost" placeholder="$0.00" readonly @bind="flightCost">
+		<input @bind-value="flightCost" id="cost" placeholder="$0.00" readonly>
 	</div>
 	<div class="btn-group-vertical">
 		<label for="name">Name</label>
-		<input id="name" placeholder="John Doe">
+		<input @bind="name" id="name" placeholder="John Doe">
 	</div>
 	<div class="btn-group-vertical">
 		<label for="citizen">Citizenship</label>
-		<input id="citizen" placeholder="US, CA, etc...">
+		<input @bind="citizenship" id="citizen" placeholder="US, CA, etc...">
 	</div>
-	<p>@flightCode</p>
-	<button class="btn-dark">Reserve Flight</button>
+	<button class="btn-dark" @onclick="() => MakeReservation(chosenFlight, name, citizenship)">Reserve Flight</button>
 </div>
 
 <h3>Find Reservation</h3>
 <div>
 	<div class="btn-group-vertical">
 		<label for="resCode">Reservation Code</label>
-		<input id="resCode" placeholder="LDDDD">
+		<input id="resCode" placeholder="LDDDD" @bind="resCode">
 	</div>
 	<div class="btn-group-vertical">
 		<label for="resAirline">Airline</label>
-		<input id="resAirline" placeholder="Airline Name">
+		<input id="resAirline" placeholder="Airline Name" @bind="resAirline">
 	</div>
 	<div class="btn-group-vertical">
 		<label for="resName">Name</label>
-		<input id="resName>" placeholder="John Doe">
+		<input id="resName>" placeholder="John Doe" @bind="resName">
 	</div>
-	<button class="btn-dark">Find Flights</button>
+	<button class="btn-dark" @onclick="() => FindReservation(resCode, resAirline, resName)">Find Reservations</button>
 </div>
 
+<h3>Reservations Found</h3>
+<ul class="btn-group-vertical">
+	@foreach (var reservation in foundReservations)
+	{
+		<li>
+			<button @onclick="() => PickReservation(reservation)">Chose</button>
+			@reservation.ToString();
+		</li>
+	}
+</ul>
+
 <h3>Update Reservation</h3>
+<div class="btn-group-vertical">
+	<div class="btn-group-vertical">
+		<label for="resCode1">Flight Code</label>
+		<input @bind-value="@chosenResCode" id="resCode2" placeholder="LL-0000" readonly n>
+	</div>
+	<div class="btn-group-vertical">
+		<label for="airline">Airline</label>
+		<input @bind-value="@chosenResAirline" id=" airline" placeholder="Airline" readonly>
+	</div>
+	<div class="btn-group-vertical">
+		<label for="weekday">Weekday</label>
+		<input @bind-value="chosenResWeekday" id="weekday" placeholder="Monday" readonly>
+	</div>
+	<div class="btn-group-vertical">
+		<label for="time">Time</label>
+		<input @bind-value="chosenResTime" id="time" placeholder="HH:MM" readonly>
+	</div>
+	<div class="btn-group-vertical">
+		<label for="cost">Cost</label>
+		<input @bind-value="flightCost" id="cost" placeholder="$0.00" readonly>
+	</div>
+	<div class="btn-group-vertical">
+		<label for="name">Name</label>
+		<input @bind="name" id="name" placeholder="John Doe">
+	</div>
+	<div class="btn-group-vertical">
+		<label for="citizen">Citizenship</label>
+		<input @bind="citizenship" id="citizen" placeholder="US, CA, etc...">
+	</div>
+	<div>
+		<label for="active"></label>
+		<input type="checkbox" @bind="IsActive"> "Active?"
+	</div>
+	<button class="btn-dark" @onclick="() => EditReservation(name, citizenship, IsActive)">Reserve Flight</button>
+</div>
+
 
 
 
 @code {
 
 	List<Flight> flightList = new();
-	private Flight thisFlight;
+	List<Reservation> reserveList = new();
+	List<Reservation> foundReservations = new();
+	List<Reservation> inactiveReservations = new();
+	Flight chosenFlight;
+	Reservation chosenReservation;
 	private string? originAirport;
 	private string? destAirport;
 	private string? weekday;
-	private string? flightCode = "help";
+	private string? flightCode;
 	private string? airline;
 	private string? dayOfWeek;
 	private string? time;
 	private string? flightCost;
+	private string? name;
+	private string? citizenship;
+	private string? resCode;
+	private string? resAirline;
+	private string? resName;
+	private string? chosenResCode;
+	private string? chosenResAirline;
+	private string? chosenResWeekday;
+	private string? chosenResTime;
+	private string? chosenResName;
+	private string? chosenResCost;
+	private bool IsActive;
 
 
-	void LoadFlights(string originAirport, string destAirport, string weekday)
+	void Submit(Flight flight)
 	{
-		flightList.Clear();
-		Directory.SetCurrentDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources"));
-		StreamReader streamReader = new StreamReader("data/flights.csv");
-		string line = streamReader.ReadLine();
-		while (line != null)
-		{
-			string[] flights = line.Split(new char[] { ',' });
-			if (flights[2] == originAirport.ToUpper() && flights[3] == destAirport.ToUpper() && flights[4].ToLower() == weekday.ToLower())
-			{
-				flightList.Add(new Flight(flights[0], flights[1], flights[2], flights[3], flights[4], flights[5], Convert.ToDouble(flights[6])));
-			}
-			line = streamReader.ReadLine();
-		}
-
-	}
-
-	void OnChecked(Flight flight)
-	{
+		chosenFlight = flight;
 		flightCode = flight.FlightCode;
 		airline = flight.AirlineName;
 		dayOfWeek = flight.Weekday;
 		time = flight.Time;
 		flightCost = String.Format("${0:0.00}", flight.Cost);
 	}
+
+	void PickReservation(Reservation reservation)
+	{
+		chosenReservation = reservation;
+		chosenResCode = reservation.ReservationCode;
+		chosenResAirline = reservation.AirlineName;
+		chosenResWeekday = reservation.Weekday;
+		chosenResTime = reservation.Time;
+		chosenResCost = String.Format("${0:0.00}", reservation.Cost);
+	}
+
+	static void CheckIfStringNull(string toCheck)
+	{
+		if (toCheck == null)
+		{
+			throw new NullStringException("One or more input fields was left blank.");
+		}
+	}
+
+	static void CheckIfFlightNull(Flight toCheck)
+	{
+		if (toCheck == null)
+		{
+			throw new NullFlightException("No flight was selected");
+		}
+	}
+
+	void MakeReservation(Flight flight, string name, string citizenship)
+	{
+		try
+		{
+			CheckIfStringNull(name);
+			CheckIfStringNull(citizenship);
+			CheckIfFlightNull(flight);
+			reserveList.Add(new Reservation(flight, name, citizenship));
+		}
+		catch(NullStringException ns)
+		{
+			Console.WriteLine(ns.Message);
+		}
+		catch(NullFlightException nf)
+		{
+			Console.Write(nf.Message);
+		}
+	}
+
+	void EditReservation(string name, string citizenship, bool IsActive)
+	{
+		try
+		{
+			CheckIfStringNull(name);
+			CheckIfStringNull(citizenship);
+			Reservation updatedReservation = chosenReservation;
+			reserveList.Remove(chosenReservation);
+			updatedReservation.Name = name;
+			updatedReservation.Citizenship = citizenship;
+			updatedReservation.IsActive = IsActive;
+			reserveList.Add(updatedReservation);
+		}
+		catch (NullStringException ns)
+		{
+			Console.WriteLine(ns.Message);
+		}
+	}
+
+	void FindReservation(string code, string airline, string name)
+	{
+		foundReservations.Clear();
+		foreach (var reservation in reserveList)
+		{
+			if (reservation.ReservationCode == code | reservation.AirlineName == airline | reservation.Name == name)
+			{
+				foundReservations.Add(reservation);
+			}
+		}
+
+	}
+
+	void LoadFlights(string originAirport, string destAirport, string weekday)
+	{
+		try
+		{
+			CheckIfStringNull(originAirport);
+			CheckIfStringNull(destAirport);
+			CheckIfStringNull(weekday);
+			flightList.Clear();
+			Directory.SetCurrentDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources"));
+			StreamReader streamReader = new StreamReader("data/flights.csv");
+			string line = streamReader.ReadLine();
+			while (line != null)
+			{
+				string[] flights = line.Split(new char[] { ',' });
+				if (flights[2] == originAirport.ToUpper() && flights[3] == destAirport.ToUpper() && flights[4].ToLower() == weekday.ToLower())
+				{
+					flightList.Add(new Flight(flights[0], flights[1], flights[2], flights[3], flights[4], flights[5], Convert.ToDouble(flights[6])));
+				}
+				line = streamReader.ReadLine();
+			}
+		}
+		catch(NullStringException ns)
+		{
+			Console.WriteLine(ns.Message);
+			return;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine("Unhandled exception was caught.");
+			return;
+		}
+
+
+	}
+
+	private async Task Persist()
+	{
+		inactiveReservations.Clear();
+		foreach (var reservation in reserveList)
+		{
+			if (reservation.IsActive == false)
+			{
+				inactiveReservations.Add(reservation);
+			}
+		}
+		var contents = JsonSerializer.Serialize(inactiveReservations);
+		var path = Path.Combine(FileSystem.AppDataDirectory, "reservations.json");
+		File.WriteAllText(path, contents);
+		await App.Current.MainPage.DisplayAlert("Reservations Saved", $"Reservations have been saved to {path}", "OK");
+	}
+
+	class NullStringException:Exception
+	{
+		public NullStringException(string message) : base(message) { }
+	}
+	class NullFlightException : Exception
+	{
+		public NullFlightException(string message) : base(message) { }
+	}
+
+	
 }

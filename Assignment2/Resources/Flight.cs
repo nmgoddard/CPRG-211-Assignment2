@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace Assignment2.Resources
 {
-	internal class Flight
+	public class Flight
 	{
 		private string flightCode;
-		public string FlightCode { get; }
+		public string FlightCode { get { return flightCode; } }
 		private string airlineName;
-		public string AirlineName { get; }
+		public string AirlineName { get { return airlineName; } }
 		private string originAirport;
-		public string OriginAirport { get; }
+		public string OriginAirport { get { return originAirport; } }
 		private string destAirport;
-		public string DestAirport { get; }
+		public string DestAirport { get { return destAirport; } }
 		private double cost;
-		public double Cost { get; }
+		public double Cost { get { return cost; } }
 		private string weekday;
-		public string Weekday { get; }
+		public string Weekday { get { return weekday; } }
 		private string time;
-		public string Time { get; }
+		public string Time { get { return time; } }
 		public bool isSelected = false; 
 
 		public Flight() {}
